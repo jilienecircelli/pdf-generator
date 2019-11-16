@@ -43,12 +43,14 @@ function init() {
 
                 writeToFile("resume.html", html);
             })
-            .then(html => {
+            .then(() => {
                 var conversion = convertFactory({
-                    converterPath: convertFactory.converters.PDF,
-                    pathToElectron: '/path/to/custom/electron-executable'
+                    converterPath: convertFactory.converters.PDF
                 })
                 conversion()
+            })
+            .catch(function(err) {
+                console.log(err);
             })
     })
 }
