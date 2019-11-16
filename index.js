@@ -1,27 +1,33 @@
-const fs = require("fs");
+const fs = require("fs"),
+    convertFactory = require('electron-html-to');
 const axios = require("axios");
 const inquirer = require("inquirer");
 var generateHTML = require("./generateHTML");
-const pdfmake = require("pdfmake");
+const path = require("path")
 
-inquirer
-    .prompt([{
-        message: "Enter your GitHub username",
-        name: "username"
-    }, {
-        type: "list",
-        message: "Choose a color",
-        name: "favColor",
-        choices: ["red", "green", "blue", "pink"]
-    }])
-    .then(function({ username }) {
+function promptUser() {
+    return inquirer
+        .prompt([{
+            message: "Enter your GitHub username",
+            name: "username"
+        }, {
+            type: "list",
+            message: "Choose a color",
+            name: "favColor",
+            choices: ["red", "green", "blue", "pink"]
+        }])
+}
+
+function init() {
+    return promptUser().then(function({ username, favColor }) {
         const queryUrl = `https://api.github.com/users/${username}`;
 
         axios
             .get(queryUrl)
             .then(function(response) {
-                console.log(response);
+                // console.log(response);
                 const res = response.data;
+                response.data.color = favColor;
                 const name = res.name;
                 const userBio = res.bio;
                 const publicRepos = res.public_repos;
@@ -29,16 +35,26 @@ inquirer
                 // const stars = ;
                 const following = res.following;
 
+                console.log(res)
+
                 console.log(name, `\n`, userBio, `\n`, publicRepos, `\n`, followers, `\n`, following)
 
-            });
-        // pdfmake
-    })
-    .then(function init() {
-        var page = generateHTML;
-        var pdf = pdfmake.createPdf(page);
-        pdf.write('resume.pdf');
+                const html = generateHTML(res);
 
+                writeToFile("resume.html", html);
+            })
+            .then(html => {
+                var conversion = convertFactory({
+                    converterPath: convertFactory.converters.PDF,
+                    pathToElectron: '/path/to/custom/electron-executable'
+                })
+                conversion()
+            })
     })
+}
 
-// init()
+function writeToFile(fileName, data) {
+    return fs.writeFileSync(path.join(process.cwd(), fileName), data);
+}
+
+init()
