@@ -174,7 +174,7 @@ function generateHTML(data) {
             <h1>Hi!</h1>
             <h2>
             My name is ${data.name}!</h1>
-            <h5>${data.company ? `Currently @ ${data.company}` : ""}</h5>
+            <h5>${data.company ? `Currently working @ ${data.company}` : ""}</h5>
             <nav class="links-nav">
                ${
                  data.location
@@ -240,7 +240,3 @@ function generateHTML(data) {
               }
 
 module.exports = generateHTML
-    // green: colors.green,
-    // red: colors.red,
-    // pink: colors.pink,
-    // blue: colors.blue,
